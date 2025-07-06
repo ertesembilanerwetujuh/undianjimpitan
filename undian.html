@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Undian Arisan</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #fff0f0;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+    }
+    header {
+      background: #b00020;
+      color: white;
+      padding: 16px 24px;
+      font-size: 22px;
+      font-weight: 600;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+    header img {
+      height: 36px;
+    }
+    button {
+      background-color: #b00020;
+      color: white;
+      padding: 14px 28px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background-color: #90001a;
+    }
+    #result {
+      margin-top: 30px;
+      font-size: 28px;
+      font-weight: bold;
+      color: #b00020;
+      padding: 20px;
+      background: #fff3f3;
+      border-radius: 16px;
+      min-width: 280px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+.riwayat {
+  margin: 40px auto;        /* auto untuk center horizontal */
+  width: 100%;
+  max-width: 500px;
+  text-align: center;       /* center teks di dalam */
+}
+
+.riwayat h3 {
+  color: #b00020;
+  margin-bottom: 10px;
+}
+
+.riwayat ul {
+  list-style: none;
+  padding: 0;
+}
+
+.riwayat li {
+  background: #fff;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;         /* biarkan isi list tetap rata kiri untuk keterbacaan */
+}
+
+.btn-group {
+  display: flex;
+  justify-content: center;  /* center button group */
+  gap: 10px;
+  margin-top: 10px;
+}
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="logo.png" alt="Logo" />
+    Arisan RT 9 RW 7
+  </header>
+
+  <div class="btn-group">
+    <button onclick="mulaiUndian()">🎲 Undi Sekarang</button>
+    <button onclick="resetPemenang()">♻️ Reset Semua</button>
+  </div>
+
+  <div id="result">Sinten nggeh...?</div>
+
+  <div class="riwayat">
+    <h3>Tuan rumah arisan bulan depan?</h3>
+    <ul id="riwayatList"></ul>
+  </div>
+
+  <script>
+    const peserta = ["AGUNG TRIARSO", "AGUS PURBOYONO", "AGUS SUHERMAN", "ALI FATAH", "ALI IMRON", "AMIN SETYONO", "ARIS SAMITIO", "BENNY", "BUDI BAGUS SANTOSO", "DANANG", "DASUKI", "HARNO", "HARTOPO", "KOZIN", "KUSNADI", "MARIYO", "MOCH ALY MAS AD", "NGALI", "NUR AZIS", "NUR KHOLISH", "PAULUS IRAWAN", "PURWANTO", "RAGIL SANTOSO", "RISTANTO ARIS SAPUTRO", "RIZKI AGUNG UTOMO", "ROS HARMANTO", "SARJO", "SLAMET", "SOLEKAN", "SUBCHAN", "SUGIYANTO", "SUJONO", "SUPRIYADI", "SUPRIYANTO", "SUWITO", "SUYANTONO", "UMAR SADLI", "WAHYU", "WIDODO", "YOGA"];
+    const hariIni = new Date().toISOString().split("T")[0];
+    const storageKey = "pemenangArisan_" + hariIni;
+    let pemenangHariIni = JSON.parse(localStorage.getItem(storageKey)) || [];
+
+    function tampilkanRiwayat() {
+      const ul = document.getElementById("riwayatList");
+      ul.innerHTML = "";
+      if (pemenangHariIni.length === 0) {
+        ul.innerHTML = "<i>Hasil undian belum ditampilkan</i>";
+        return;
+      }
+      pemenangHariIni.forEach((nama, i) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<span>${i + 1}. ${nama}</span><span>✅</span>`;
+        ul.appendChild(li);
+      });
+    }
+
+    function mulaiUndian() {
+      const belumMenang = peserta.filter(p => !pemenangHariIni.includes(p));
+      const resultBox = document.getElementById("result");
+
+      if (belumMenang.length === 0) {
+        resultBox.textContent = "🎉 Semua peserta sudah menang hari ini!";
+        return;
+      }
+
+      let acakInterval;
+      let waktuAcak = 0;
+      acakInterval = setInterval(() => {
+        const randomNama = belumMenang[Math.floor(Math.random() * belumMenang.length)];
+        resultBox.textContent = `🔄 ${randomNama}`;
+        waktuAcak += 100;
+        if (waktuAcak >= 10000) {
+          clearInterval(acakInterval);
+          const pemenang = belumMenang[Math.floor(Math.random() * belumMenang.length)];
+          resultBox.textContent = `🎉 ${pemenang} 🎉`;
+          pemenangHariIni.push(pemenang);
+          localStorage.setItem(storageKey, JSON.stringify(pemenangHariIni));
+          tampilkanRiwayat();
+        }
+      }, 100);
+    }
+
+    function resetPemenang() {
+      if (confirm("⚠️ Apakah kamu yakin ingin menghapus semua pemenang hari ini?")) {
+        localStorage.removeItem(storageKey);
+        pemenangHariIni = [];
+        document.getElementById("result").textContent = "Sinten nggeh...?";
+        tampilkanRiwayat();
+      }
+    }
+
+    tampilkanRiwayat();
+  </script>
+</body>
+</html>
